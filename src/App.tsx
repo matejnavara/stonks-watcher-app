@@ -18,19 +18,13 @@ import {
   ScrollView,
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import moment from 'moment';
 
-import {DataObject, QuoteObject} from './src/interfaces/app.interface';
-
-const finnhub = require('finnhub');
+import {getStockQuote, getStockCandles} from './services/finnhub/stocks';
+import {percentageChange} from './utils/finnhub.utils';
 
 const App = () => {
   const [data, setData] = useState({});
-  const [current, setCurrent] = useState(0);
-
-  const api_key = finnhub.ApiClient.instance.authentications['api_key'];
-  api_key.apiKey = 'c13io2748v6rj20aijf0';
-  const finnhubClient = new finnhub.DefaultApi();
+  const [quote, setQuote] = useState({current: 0, previous: 0, timestamp: 0});
 
   useEffect(() => refresh(), []);
 
@@ -39,35 +33,25 @@ const App = () => {
     refreshQuote();
   };
 
-  const refreshData = () =>
-    finnhubClient.stockCandles(
-      'AMZN', // Symbol
-      'D', // resolution
-      moment().subtract(1, 'week').unix(), //from timestamp
-      moment().unix(), //to timestamp
-      {},
-      (error: Error, data: DataObject) => {
-        const normalisedData = data.t.map(
-          (timestamp: number, index: number) => ({
-            values: {
-              shadowH: data.h[index],
-              shadowL: data.l[index],
-              open: data.o[index],
-              close: data.c[index],
-            },
-            label: moment.unix(timestamp).format('DD/MM/YYYY'),
-          })
-        );
-        console.log(normalisedData);
-        setData(normalisedData);
-      }
-    );
+  const refreshData = async () => {
+    try {
+      const candleData = await getStockCandles('AMZN');
+      setData(candleData);
+    } catch (error) {
+      console.log('Opps:', error);
+    }
+  };
 
-  const refreshQuote = () =>
-    finnhubClient.quote('AMZN', (error: Error, data: QuoteObject) => {
-      console.log('current', data);
-      setCurrent(data.c);
-    });
+  const refreshQuote = async () => {
+    try {
+      const quoteData = await getStockQuote('AMZN');
+      setQuote(quoteData);
+    } catch (error) {
+      console.log('Opps:', error);
+    }
+  };
+
+  const percentChange = percentageChange(quote.current, quote.previous);
 
   return (
     <>
@@ -75,9 +59,17 @@ const App = () => {
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollView}>
           <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>Stonks Watcher</Text>
+            <Text style={styles.sectionTitle}>AMZN Stonks Watcher</Text>
             <Text style={styles.sectionDescription}>
-              Current AMZN: ${current}
+              Current: ${quote.current}
+            </Text>
+            <Text style={styles.sectionDescription}>
+              Previous: ${quote.previous}
+            </Text>
+            <Text style={styles.sectionDescription}>
+              {percentChange == 0 && 'No change'}
+              {percentChange > 0 && `YAY up ${percentChange}%`}
+              {percentChange < 0 && `BOO down ${percentChange}%`}
             </Text>
           </View>
         </ScrollView>
