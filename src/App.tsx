@@ -16,14 +16,23 @@ import {
   Text,
   StatusBar,
   ScrollView,
+  Dimensions,
 } from 'react-native';
+import {
+  VictoryCandlestick,
+  VictoryChart,
+  VictoryTooltip,
+  VictoryTheme,
+} from 'victory-native';
+
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 import {getStockQuote, getStockCandles} from './services/finnhub/stocks';
 import {percentageChange} from './utils/finnhub.utils';
+import Svg from 'react-native-svg';
 
 const App = () => {
-  const [data, setData] = useState({});
+  const [data, setData] = useState([]);
   const [quote, setQuote] = useState({current: 0, previous: 0, timestamp: 0});
 
   useEffect(() => refresh(), []);
@@ -71,6 +80,34 @@ const App = () => {
               {percentChange > 0 && `YAY up ${percentChange}%`}
               {percentChange < 0 && `BOO down ${percentChange}%`}
             </Text>
+            <VictoryChart
+              width={Dimensions.get('screen').width * 0.9}
+              scale={{x: 'time'}}
+              theme={VictoryTheme.material}>
+              <VictoryCandlestick
+                data={data}
+                candleColors={{positive: 'green', negative: 'red'}}
+                lowLabels={({datum}) => Math.round(datum.low)}
+                lowLabelComponent={<VictoryTooltip pointerLength={0} />}
+                labelOrientation={{
+                  close: 'right',
+                  open: 'right',
+                  high: 'top',
+                  low: 'bottom',
+                }}
+                events={[
+                  {
+                    target: 'data',
+                    eventHandlers: {
+                      onClick: () => ({
+                        target: 'lowLabels',
+                        mutation: () => ({active: true}),
+                      }),
+                    },
+                  },
+                ]}
+              />
+            </VictoryChart>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -84,7 +121,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    backgroundColor: 'pink',
+    backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
   },

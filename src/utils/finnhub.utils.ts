@@ -3,13 +3,11 @@ import {RawCandleData, CleanCandleData} from '../interfaces/finnhub.interface';
 
 export const normaliseCandleData = (data: RawCandleData): CleanCandleData[] =>
   data.t.map((timestamp: number, index: number) => ({
-    values: {
-      shadowH: data.h[index],
-      shadowL: data.l[index],
-      open: data.o[index],
-      close: data.c[index],
-    },
-    label: moment.unix(timestamp).format('DD/MM/YYYY'),
+    high: data.h[index],
+    low: data.l[index],
+    open: data.o[index],
+    close: data.c[index],
+    x: moment.unix(timestamp).format('DD/MM/YYYY'),
   }));
 
 export const percentageChange = (

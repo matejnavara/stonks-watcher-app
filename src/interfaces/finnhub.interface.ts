@@ -9,13 +9,11 @@ export interface RawCandleData {
 }
 
 export interface CleanCandleData {
-  values: {
-    shadowH: number;
-    shadowL: number;
-    open: number;
-    close: number;
-  };
-  label: string;
+  high: number;
+  low: number;
+  open: number;
+  close: number;
+  x: string;
 }
 
 export interface RawQuoteData {
