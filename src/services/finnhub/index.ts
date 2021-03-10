@@ -1,6 +1,5 @@
+import Config from 'react-native-config';
 import axios, {AxiosResponse} from 'axios';
-
-import {apiConfig} from '../../config/finnhub.config';
 
 interface Error {
   message: string;
@@ -8,11 +7,11 @@ interface Error {
 }
 
 const finnhubApi = axios.create({
-  baseURL: apiConfig.API_URL,
+  baseURL: Config.API_URL,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
-    'X-Finnhub-Token': apiConfig.TOKEN,
+    'X-Finnhub-Token': Config.TOKEN,
   },
   timeout: 3000,
 });
