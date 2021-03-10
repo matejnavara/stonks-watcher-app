@@ -11,17 +11,19 @@
 import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
-  StyleSheet,
   View,
   Text,
   StatusBar,
   ScrollView,
   ActivityIndicator,
+  RefreshControl,
+  Button,
 } from 'react-native';
 
 import {getStockQuote, getStockCandles} from './services/finnhub/stocks';
 import {CleanCandleData} from './interfaces/finnhub.interface';
 
+import {styles} from './styles.global';
 import CurrentPrice from './components/CurrentPrice';
 import CandleChart from './components/CandleChart';
 
@@ -32,15 +34,21 @@ const App = () => {
     lowest: 0,
   });
   const [quote, setQuote] = useState({current: 0, previous: 0, timestamp: 0});
+  const [refreshing, setRefreshing] = React.useState(false);
 
   useEffect(() => refresh(), []);
 
   const refresh = () => {
-    refreshData();
-    refreshQuote();
+    const fetchData = async () => {
+      setRefreshing(true);
+      await refreshCandles();
+      await refreshQuote();
+      setRefreshing(false);
+    };
+    fetchData();
   };
 
-  const refreshData = async () => {
+  const refreshCandles = async () => {
     try {
       const candleData = await getStockCandles('AMZN');
       setCandles(candleData);
@@ -62,47 +70,36 @@ const App = () => {
     <>
       <StatusBar barStyle="dark-content" />
       <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollView}>
+        <ScrollView
+          contentContainerStyle={styles.scrollView}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={refresh} />
+          }>
           <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>AMZN Stonks Watcher</Text>
-            {quote.current > 0 ? (
+            <Text style={styles.sectionTitle}>AMZN</Text>
+            {!refreshing || quote.current > 0 ? (
               <CurrentPrice quote={quote} />
             ) : (
               <ActivityIndicator />
             )}
-            {candles.data.length > 0 ? (
+            {!refreshing || candles.data.length > 0 ? (
               <CandleChart candles={candles} />
             ) : (
               <ActivityIndicator size="large" />
             )}
           </View>
+          {!refreshing && (
+            <Button
+              onPress={refresh}
+              title="Refresh"
+              color="#201584"
+              accessibilityLabel="Refresh stock data"
+            />
+          )}
         </ScrollView>
       </SafeAreaView>
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-    backgroundColor: 'white',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: 'black',
-  },
-});
 
 export default App;
