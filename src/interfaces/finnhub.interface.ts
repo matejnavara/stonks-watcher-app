@@ -8,12 +8,17 @@ export interface RawCandleData {
   v: Array<number>;
 }
 
-export interface CleanCandleData {
+export interface SingleCandleData {
   high: number;
   low: number;
   open: number;
   close: number;
   x: string;
+}
+export interface CleanCandleData {
+  data: SingleCandleData[];
+  highest: number;
+  lowest: number;
 }
 
 export interface RawQuoteData {

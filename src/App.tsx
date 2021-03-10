@@ -16,23 +16,21 @@ import {
   Text,
   StatusBar,
   ScrollView,
-  Dimensions,
+  ActivityIndicator,
 } from 'react-native';
-import {
-  VictoryCandlestick,
-  VictoryChart,
-  VictoryTooltip,
-  VictoryTheme,
-} from 'victory-native';
-
-import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 import {getStockQuote, getStockCandles} from './services/finnhub/stocks';
-import {percentageChange} from './utils/finnhub.utils';
-import Svg from 'react-native-svg';
+import {CleanCandleData} from './interfaces/finnhub.interface';
+
+import CurrentPrice from './components/CurrentPrice';
+import CandleChart from './components/CandleChart';
 
 const App = () => {
-  const [data, setData] = useState([]);
+  const [candles, setCandles] = useState<CleanCandleData>({
+    data: [],
+    highest: 0,
+    lowest: 0,
+  });
   const [quote, setQuote] = useState({current: 0, previous: 0, timestamp: 0});
 
   useEffect(() => refresh(), []);
@@ -45,7 +43,7 @@ const App = () => {
   const refreshData = async () => {
     try {
       const candleData = await getStockCandles('AMZN');
-      setData(candleData);
+      setCandles(candleData);
     } catch (error) {
       console.log('Opps:', error);
     }
@@ -60,8 +58,6 @@ const App = () => {
     }
   };
 
-  const percentChange = percentageChange(quote.current, quote.previous);
-
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -69,45 +65,16 @@ const App = () => {
         <ScrollView contentContainerStyle={styles.scrollView}>
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>AMZN Stonks Watcher</Text>
-            <Text style={styles.sectionDescription}>
-              Current: ${quote.current}
-            </Text>
-            <Text style={styles.sectionDescription}>
-              Previous: ${quote.previous}
-            </Text>
-            <Text style={styles.sectionDescription}>
-              {percentChange == 0 && 'No change'}
-              {percentChange > 0 && `YAY up ${percentChange}%`}
-              {percentChange < 0 && `BOO down ${percentChange}%`}
-            </Text>
-            <VictoryChart
-              width={Dimensions.get('screen').width * 0.9}
-              scale={{x: 'time'}}
-              theme={VictoryTheme.material}>
-              <VictoryCandlestick
-                data={data}
-                candleColors={{positive: 'green', negative: 'red'}}
-                lowLabels={({datum}) => Math.round(datum.low)}
-                lowLabelComponent={<VictoryTooltip pointerLength={0} />}
-                labelOrientation={{
-                  close: 'right',
-                  open: 'right',
-                  high: 'top',
-                  low: 'bottom',
-                }}
-                events={[
-                  {
-                    target: 'data',
-                    eventHandlers: {
-                      onClick: () => ({
-                        target: 'lowLabels',
-                        mutation: () => ({active: true}),
-                      }),
-                    },
-                  },
-                ]}
-              />
-            </VictoryChart>
+            {quote.current > 0 ? (
+              <CurrentPrice quote={quote} />
+            ) : (
+              <ActivityIndicator />
+            )}
+            {candles.data.length > 0 ? (
+              <CandleChart candles={candles} />
+            ) : (
+              <ActivityIndicator size="large" />
+            )}
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -134,13 +101,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
+    color: 'black',
   },
 });
 

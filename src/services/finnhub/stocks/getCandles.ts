@@ -3,7 +3,7 @@ import api, {handleError} from '../index';
 import {CleanCandleData} from '../../../interfaces/finnhub.interface';
 import {normaliseCandleData} from '../../../utils/finnhub.utils';
 
-export default async (stockSymbol: string): Promise<CleanCandleData[]> => {
+export default async (stockSymbol: string): Promise<CleanCandleData> => {
   if (!stockSymbol) {
     return handleError({message: 'Symbol is required'});
   }
