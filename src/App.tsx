@@ -13,11 +13,13 @@ import {
   SafeAreaView,
   View,
   Text,
+  Image,
   StatusBar,
   ScrollView,
   ActivityIndicator,
   RefreshControl,
   Button,
+  Dimensions,
 } from 'react-native';
 
 import {getStockQuote, getStockCandles} from './services/finnhub/stocks';
@@ -75,6 +77,11 @@ const App = () => {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={refresh} />
           }>
+          <Image
+            source={require('./assets/stonks-viewer.jpeg')}
+            resizeMode="cover"
+            style={{flex: 1, maxWidth: Dimensions.get('screen').width}}
+          />
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>AMZN</Text>
             {!refreshing || quote.current > 0 ? (
@@ -87,15 +94,15 @@ const App = () => {
             ) : (
               <ActivityIndicator size="large" />
             )}
+            {!refreshing && (
+              <Button
+                onPress={refresh}
+                title="Refresh"
+                color="#201584"
+                accessibilityLabel="Refresh stock data"
+              />
+            )}
           </View>
-          {!refreshing && (
-            <Button
-              onPress={refresh}
-              title="Refresh"
-              color="#201584"
-              accessibilityLabel="Refresh stock data"
-            />
-          )}
         </ScrollView>
       </SafeAreaView>
     </>

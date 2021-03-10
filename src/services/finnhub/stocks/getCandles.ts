@@ -2,15 +2,17 @@ import moment from 'moment';
 import api, {handleError} from '../index';
 import {CleanCandleData} from '../../../interfaces/finnhub.interface';
 import {normaliseCandleData} from '../../../utils/finnhub.utils';
+import {lastWeekdays} from '../../../utils/date.utils';
 
 export default async (stockSymbol: string): Promise<CleanCandleData> => {
   if (!stockSymbol) {
     return handleError({message: 'Symbol is required'});
   }
   try {
-    const resolution = 'D';
-    const from = moment().subtract(1, 'week').unix();
-    const to = moment().unix();
+    // TODO: extend endpoint to call different resolutions and timeframes
+    const resolution = 'D'; // Display Day resolution
+    const from = lastWeekdays(7).unix(); // Last 7 open market days
+    const to = moment().unix(); // Until present
     const {data} = await api.get(
       `stock/candle?symbol=${stockSymbol}&resolution=${resolution}&from=${from}&to=${to}`
     );
