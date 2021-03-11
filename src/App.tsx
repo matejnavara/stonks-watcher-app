@@ -28,6 +28,7 @@ import {CleanCandleData} from './interfaces/finnhub.interface';
 import {styles} from './styles.global';
 import CurrentPrice from './components/CurrentPrice';
 import CandleChart from './components/CandleChart';
+import ImageLoader from './components/ImageLoader';
 
 const App = () => {
   const [candles, setCandles] = useState<CleanCandleData>({
@@ -77,10 +78,14 @@ const App = () => {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={refresh} />
           }>
-          <Image
+          <ImageLoader
             source={require('./assets/stonks-viewer.jpeg')}
             resizeMode="cover"
-            style={{flex: 1, maxWidth: Dimensions.get('screen').width}}
+            style={{
+              flex: 1,
+              maxHeight: Dimensions.get('screen').height * 0.4,
+              maxWidth: Dimensions.get('screen').width,
+            }}
           />
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>AMZN</Text>

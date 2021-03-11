@@ -21,6 +21,7 @@ export const handleError = (error: Error) => {
     message: error.message,
     data: error.response?.data,
     status: error.response?.status,
+    error,
   });
 };
 

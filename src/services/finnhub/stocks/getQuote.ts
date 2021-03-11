@@ -7,7 +7,6 @@ export default async (stockSymbol: string): Promise<CleanQuoteData> => {
   }
   try {
     const {data} = await api.get(`quote?symbol=${stockSymbol}`);
-    console.log('🚀 ~ file: getQuote.ts ~ line 10 ~ data', data);
     return {
       current: data.c,
       previous: data.pc,

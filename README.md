@@ -18,6 +18,9 @@ These instructions will get you a copy of the project up and running on your loc
 - _IMPORTANT_: This is not a secure place for API keys and intended for local/development use only. For better ways to handle this please see: [React Native Security](https://reactnative.dev/docs/security)
 
 3. `npm install`
+
+- then for iOS: `cd ios && pod install`
+
 4. Ensure you have your target development environment ready or [set it up](https://reactnative.dev/docs/environment-setup)
 
 ### Run
@@ -34,11 +37,15 @@ Then:
 yarn ios
 ```
 
+![iOS preview](./src/assets/ios-preview.png)
+
 #### For Android
 
 ```
 yarn android
 ```
+
+![Android preview](./src/assets/android-preview.png)
 
 ## Built With
 
@@ -76,6 +83,7 @@ src/
 
 - [ ] Extend to some other Stonks (FAANG perhaps?)
 - [ ] Add interactivity to chart, resolution/range changing
-- [ ] Use Websocket for teal-time price streams
+- [ ] Market open/closed indicator
+- [ ] Use Websocket for real-time price streams
 - [ ] Much more testing
 - [ ] Much more styling (maybe styled-components)

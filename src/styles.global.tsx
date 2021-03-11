@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   sectionContainer: {
-    marginTop: 20,
+    marginVertical: 10,
     paddingHorizontal: 24,
     alignItems: 'center',
     justifyContent: 'center',
